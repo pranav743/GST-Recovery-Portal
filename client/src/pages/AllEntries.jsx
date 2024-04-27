@@ -125,9 +125,11 @@ const EntryRow = ({ info }) => {
     return (
         <div onClick={() => { navigate(`/entry/${slugify(info.demandID)}`) }} style={{ minHeight: '50px', width: '100%', display: 'flex', margin: '1px 0', padding: 15, borderRadius: '5px', backgroundColor: '#eee' }}>
 
-            <div style={{ width: '33%', display: 'flex', alignItems: 'center', justifyContent: 'left' }}>{info.tradeNameOfTaxpayer}</div>
-            <div style={{ width: '33%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#888', minWidth: '200px' }}>{info.GSTIN}</div>
-            <div style={{ width: '33%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{info.GSTDesk}</div>
+            <div style={{ width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'left' }}>{info.tradeNameOfTaxpayer}</div>
+            <div style={{ width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#888', minWidth: '200px' }}>{info.GSTIN}</div>
+            <div style={{ width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{info.GSTDesk}</div>
+            <div style={{ width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{info.FYOfTaxPeriod}</div>
+
 
         </div>
     );
@@ -244,6 +246,7 @@ export default function AllEntries() {
                         <MenuItem value={'tradeNameOfTaxpayer'}>Trade Name</MenuItem>
                         <MenuItem value={'GSTIN'}>GSTIN</MenuItem>
                         <MenuItem value={'GSTDesk'}>GST Desk</MenuItem>
+                        <MenuItem value={'FYOfTaxPeriod'}>Year</MenuItem>
                     </Select>
                 </FormControl>
                 <ExportToExcelButton excelData={demandData.data} desk={user.username} isAdmin={user.isAdmin}/>
@@ -267,6 +270,8 @@ export default function AllEntries() {
                 <div style={{ width: '33%', display: 'flex', alignItems: 'center', justifyContent: 'left' }}>Trade Name {selectedOption === 'tradeNameOfTaxpayer' && <SortIndicator onClick={sortIn} />}</div>
                 <div style={{ width: '33%', display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '200px' }}>GSTIN {selectedOption === 'GSTIN' && <SortIndicator onClick={sortIn} />} </div>
                 <div style={{ width: '33%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Desk {selectedOption === 'GSTDesk' && <SortIndicator onClick={sortIn} />}</div>
+                <div style={{ width: '33%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Year {selectedOption === 'FYOfTaxPeriod' && <SortIndicator onClick={sortIn} />}</div>
+
 
             </div>
             <div style={{ height: '100%', width: '100%', justifyContent: 'center', overflowY: 'auto', backgroundColor: '#ddd' }}>
