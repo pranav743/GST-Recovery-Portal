@@ -10,6 +10,7 @@ import AllUsers from './Admin/AllUsers';
 import AddEntry from './Admin/AddEntry';
 import AllEntries from './AllEntries';
 import SingleEntry from './SingleEntry';
+import FileUpload from './UploadData';
 import { getUserDetails } from '../utils/Session';
 
 const PrivateRoute = ({ element }) => {
@@ -38,6 +39,9 @@ const MainPage = () => {
         <Route path="/admin/add-entry" element={<PrivateRoute element={<AddEntry />}/>} />
         <Route path="/entries/all" element={<PrivateRoute element={<AllEntries />}/>} />
         <Route path="/entry/:id" element={<PrivateRoute element={<SingleEntry />}/>} />
+        <Route path="/admin/upload" element={<PrivateRoute element={<FileUpload />}/>} />
+        
+
       </Routes>
     </div>
   )

@@ -92,7 +92,7 @@ const demandSchema = new mongoose.Schema({
         // minlength: [15, "Details of ARN Case Number must be exactly 15 characters long"],
         default: ""
     },
-    dateOfARNNo: Date,
+    dateOfARNNo: String,
     paidWithDRC03: {
         type: String,
         default: false,
@@ -103,7 +103,7 @@ const demandSchema = new mongoose.Schema({
         // minlength: [15, "ARN Number DRC-03 must be exactly 15 characters long"]
         default: '',
     },
-    dateOfDRC03: Date,
+    dateOfDRC03: String,
     amountPaidByRTPAgainstLiability: {
         type: String,
         default: ""
@@ -120,7 +120,7 @@ const demandSchema = new mongoose.Schema({
     // Multiple
     RecoveryDetails: [
         {
-            DRC13BankAttachedDate: Date,
+            DRC13BankAttachedDate: String,
             bankBalance: {
                 type: String,
                 default: ""
@@ -129,20 +129,20 @@ const demandSchema = new mongoose.Schema({
                 type: String,
                 default: ""
             },
-            DRC13DebtorAttachedDate: Date,
+            DRC13DebtorAttachedDate: String,
         }
 
     ],
-    DRC13BankAttachedDate: Date,
-    bankBalance: {
-        type: String,
-        default: ""
-    },
-    amountRecoveredFromBankTotal: {
-        type: String,
-        default: ""
-    },
-    DRC13DebtorAttachedDate: Date,
+    DRC13BankAttachedDate: String,
+    // bankBalance: {
+    //     type: String,
+    //     default: ""
+    // },
+    // amountRecoveredFromBankTotal: {
+    //     type: String,
+    //     default: ""
+    // },
+    DRC13DebtorAttachedDate: String,
 
     // Multiple End
 
@@ -150,9 +150,9 @@ const demandSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    attachmentOfMovablePropertyDRC16Date: Date,
-    attachmentOfImmovablePropertyDRC16Date: Date,
-    dateOfAuctionFixed: Date,
+    attachmentOfMovablePropertyDRC16Date: String,
+    attachmentOfImmovablePropertyDRC16Date: String,
+    dateOfAuctionFixed: String,
     amountRecoveredFromAuction: {
         type: String,
         default: ""

@@ -91,6 +91,7 @@ export default function PersistentDrawerLeft() {
     { text: 'Add User', icon: <PeopleIcon />, path: '/admin/add-user' },
     { text: 'Users', icon: <AssignmentIcon />, path: '/admin/users' },
     { text: 'Add Entry', icon: <AssignmentIcon />, path: '/admin/add-entry' },
+    { text: 'Upload Data', icon: <AssignmentIcon />, path: '/admin/upload' },
   ];
 
   const changePage = (url) => {

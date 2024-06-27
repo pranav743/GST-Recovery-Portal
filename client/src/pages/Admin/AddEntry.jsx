@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { Grid } from '@mui/material';
@@ -9,6 +9,7 @@ import { successMessage, errorMessage } from '../../components/Toast';
 import axios from 'axios';
 import uri from '../../utils/URL';
 import Autocomplete from '@mui/material/Autocomplete';
+import { getUserDetails } from '../../utils/Session';
 
 const AddEntry = () => {
     const [formData, setFormData] = useState({
@@ -112,6 +113,9 @@ const AddEntry = () => {
     };
 
     const handleUpload = async () => {
+        if (!currentUser.isAdmin){
+            errorMessage("Not Authorized");
+        }
         try {
             const res = await axios.post(uri + "/add-entry", formData);
             console.log(res);
@@ -134,7 +138,29 @@ const AddEntry = () => {
         '2022-23',
         '2023-24',
         '2024-25',
-      ];
+        '2025-26',
+        '2026-27'
+    ];
+
+    const [currentUser, setCurrentUser] = useState(false);
+    const getCurrentUser = async () => {
+        if (currentUser){
+            return
+        }
+        try {
+            const curr_user = await getUserDetails();
+            console.log(curr_user);
+            setCurrentUser(curr_user.user);
+            if (!curr_user.user.isAdmin){
+                window.location.href = "/login";
+            }
+        } catch (error) {
+            window.location.href = "/login";
+        }
+    }
+    useEffect(() => {
+        getCurrentUser();
+    });
 
 
 
@@ -200,21 +226,21 @@ const AddEntry = () => {
                 />
             </Grid>
             <Grid item xs={12} sm={6}>
-            <Autocomplete
-          fullWidth
-          options={fiscalYears}
-          getOptionLabel={(option) => option}
-          value={formData.FYOfTaxPeriod}
-          onChange={(event, value) => handleChange({ target: { name: 'FYOfTaxPeriod', value } })}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="FY of Tax Period"
-              name="FYOfTaxPeriod"
-              variant="outlined"
-            />
-          )}
-        />
+                <Autocomplete
+                    fullWidth
+                    options={fiscalYears}
+                    getOptionLabel={(option) => option}
+                    value={formData.FYOfTaxPeriod}
+                    onChange={(event, value) => handleChange({ target: { name: 'FYOfTaxPeriod', value } })}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            label="FY of Tax Period"
+                            name="FYOfTaxPeriod"
+                            variant="outlined"
+                        />
+                    )}
+                />
             </Grid>
             <Grid item xs={12} sm={6}>
                 <TextField

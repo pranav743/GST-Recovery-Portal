@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const User = require("../models/user");
 const Demand = require('../models/recovery');
+const xlsx = require('xlsx')
 
 // Route for adding a new user or updating an inactive user
 const addUser = async (req, res) => {
@@ -171,8 +172,16 @@ const addEntry = async (req, res) => {
 
 const updateEntry = async (req, res) => {
   try {
-    const data = req.body;
-    console.log(data._id);
+    var data = req.body;
+    console.log(data);
+    const actual_balanace_dues = Number(data.demandAsPerOrderTotal) - Number(data.partPaymentMadeInAppeal) - Number(data.paidWithDRC03) - Number(data.amountPaidByRTPAgainstLiability) - Number(data.amountRecoveredFromCreditLedger) - Number(data.amountRecoveredFromCashLedger) - Number(data.RecoveryDetails[0]?.amountRecoveredFromBank || "0") - Number(data.amountRecoveredFromDebtors) - Number(data.amountRecoveredFromAuction) - Number(data.amountReducedOtherwise)
+    if (actual_balanace_dues >= 0){
+      data.actualBalanceDues = actual_balanace_dues.toString();
+    } else {
+      data.actualBalanceDues = "0";
+    }
+    
+
     const updatedDemand = await Demand.findOneAndUpdate(
       { _id: data._id }, // Filter by ID
       data, // New data to be updated
@@ -192,10 +201,88 @@ const updateEntry = async (req, res) => {
   }
 };
 
+const uploadExcel = async (req, res) => {
+  try {
+    
+    const filePath = 'uploads/uploaded.xlsx';
+    
+    const workbook = xlsx.readFile(filePath);
+    // console.log(workbook);
+    const sheet_name_list = workbook.SheetNames;
+    const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+    
+    jsonData.forEach(async (item) => {
+      const existingDemand = await Demand.findOne({ demandID: item['Demand ID'] });
+            if (!existingDemand) {
+              var newDemand = ({
+                demandID: item['Demand ID'] ? item['Demand ID'] : "",
+                dateOfDemand: item['Date of Demand'] ? new Date(item['Date of Demand']) : new Date(),
+                GSTIN: item['GSTIN'] ? item['GSTIN'] : "",
+                tradeNameOfTaxpayer: item['Trade Name of the Taxpayer'] ? item['Trade Name of the Taxpayer'] : "",
+                legalNameOfTaxpayer: item['Legal Name of the Taxpayer'] ? item['Legal Name of the Taxpayer'] : "",
+                taxPeriod: item['Tax Period'] ? item['Tax Period'] : "",
+                FYOfTaxPeriod: item['FY of Tax Period'] ? item['FY of Tax Period'] : "",
+                section: item['Section'] ? item['Section'] : "",
+                GSTDesk: item['GST Desk'] ? item['GST Desk'] : "",
+                OSPendingDemandTotal: item['O/S Pending Demand TOTAL'] ? item['O/S Pending Demand TOTAL'] : '0',
+                demandAsPerOrderTotal: item['Demand As per Order TOTAL'] ? item['Demand As per Order TOTAL'] : '0',
+                correctRecoveryID: item['Correct Recovery ID'] ? item['Correct Recovery ID'] : "",
+                reasonOfDemand: item['Reason of Demand (Drop Down)'] ? item['Reason of Demand (Drop Down)'] : "",
+                statusOfRecovery: item['Status of Recovery'] ? item['Status of Recovery'] : "",
+                reasonForNotAvailable: item['Reason for Not available (Drop down)/ Action taken in Available'] ? item['Reason for Not available (Drop down)/ Action taken in Available'] : "",
+                partPaymentMadeInAppeal: item['Part-payment made in Appeal'] ? item['Part-payment made in Appeal'] : "0",
+                authorityGrantingStay: item['Authority granting Stay etc (Drop Down)'] ? item['Authority granting Stay etc (Drop Down)'] : "",
+                detailsOfARNCaseNo: item['Details of  ARN Case no etc'] ? item['Details of  ARN Case no etc'] : "",
+                dateOfARNNo: item['Date of ARN No of APL-01 or 02'] ? item['Date of ARN No of APL-01 or 02'] : "",
+                paidWithDRC03: item['Paid with DRC-03'] ? item['Paid with DRC-03'] : '0',
+                ARNNoOfDRC03: item['ARN No. of DRC-03'] ? item['ARN No. of DRC-03'] : "",
+                dateOfDRC03: item['Date of DRC-03'] ? item['Date of DRC-03'] : "",
+                amountPaidByRTPAgainstLiability: item['Amount paid by RTP against liability'] ? item['Amount paid by RTP against liability'] : "0",
+                amountRecoveredFromCreditLedger: item['Amount recovered from Credit Ledger'] ? item['Amount recovered from Credit Ledger'] : "0",
+                amountRecoveredFromCashLedger: item['Amount recovered from CASH Ledger'] ? item['Amount recovered from CASH Ledger'] : "0",
+                RecoveryDetails: [{
+                  DRC13BankAttachedDate: item['DRC 13- Bank Attached date'] ? item['DRC 13- Bank Attached date'] : "",
+                  bankBalance: item['Bank balance'] ? item['Bank balance'] : "",
+                  amountRecoveredFromBank: item['Amount recovered from Bank'] ? item['Amount recovered from Bank'] : "0",
+                  DRC13DebtorAttachedDate: item['DRC 13- Debtor Attached date'] ? item['DRC 13- Debtor Attached date'] : ""
+                }],
+                amountRecoveredFromDebtors: item['Amount recovered from Debtors'] ? item['Amount recovered from Debtors'] : "0",
+                attachmentOfMovablePropertyDRC16Date: item['(Date)Attachment of Movable Property DRC 16'] ? item['(Date)Attachment of Movable Property DRC 16'] : "",
+                attachmentOfImmovablePropertyDRC16Date: item['(Date)Attachment of Immovable Property DRC 16'] ? item['(Date)Attachment of Immovable Property DRC 16'] : "",
+                dateOfAuctionFixed: item['Date of Auction fixed'] ? item['Date of Auction fixed'] : "",
+                amountRecoveredFromAuction: item['Amount recovered from Auction'] ? item['Amount recovered from Auction'] : "0",
+                amountReducedOtherwise: item['Amount reduced otherwise'] ? item['Amount reduced otherwise'] : "0",
+                reasonForReduction: item['Reason for reduction'] ? item['Reason for reduction'] : "",
+                actualBalanceDues: item['Actual Balance Dues'] ? item['Actual Balance Dues'] : "0",
+                remark: item['Remark if any'] ? item['Remark if any'] : ""
+            });
+            // console.log(newDemand)
+            const actual_balanace_dues = Number(newDemand.demandAsPerOrderTotal) - Number(newDemand.partPaymentMadeInAppeal) - Number(newDemand.paidWithDRC03) - Number(newDemand.amountPaidByRTPAgainstLiability) - Number(newDemand.amountRecoveredFromCreditLedger) - Number(newDemand.amountRecoveredFromCashLedger) - Number(newDemand.RecoveryDetails[0]?.amountRecoveredFromBank || "0") - Number(newDemand.amountRecoveredFromDebtors) - Number(newDemand.amountRecoveredFromAuction) - Number(newDemand.amountReducedOtherwise)
+            // console.log(actual_balanace_dues);
+            if (actual_balanace_dues < 0){
+              newDemand.actualBalanceDues = "0"
+            }
+            else newDemand.actualBalanceDues = actual_balanace_dues.toString() ;
+
+            newDemand = new Demand(newDemand);
+            
+        // console.log(newDemand);
+            await newDemand.save();
+      }
+    });
+    return res.status(200).json({ success: true, msg: "Excel File Uploaded Successfully" });
+  } catch (error) {
+    console.error("Problem in Excel:", error);
+    return res.status(500).json({ success: false, msg: "Upload Correct Excel Format" });
+  }
+};
+
+
 module.exports = {
   addUser,
   deleteUser,
   getAllUsers,
   addEntry,
-  updateEntry
+  updateEntry,
+  uploadExcel
 };
