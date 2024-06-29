@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const Demand = require("../models/recovery");
 const slugify = require('slugify');

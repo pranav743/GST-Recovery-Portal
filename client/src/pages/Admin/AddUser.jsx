@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, TextField, Button, Typography } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 import { successMessage, errorMessage } from '../../components/Toast';
 import axios from 'axios';
 import uri from '../../utils/URL';
+import { getUserDetails } from '../../utils/Session';
 
 
 const AddUser = () => {
@@ -29,6 +30,26 @@ const AddUser = () => {
             errorMessage(error.response.data.msg);
         }
     };
+
+    const [currentUser, setCurrentUser] = useState(false);
+    const getCurrentUser = async () => {
+        if (currentUser){
+            return
+        }
+        try {
+            const curr_user = await getUserDetails();
+            console.log(curr_user);
+            setCurrentUser(curr_user.user);
+            if (!curr_user.user.isAdmin){
+                window.location.href = "/login";
+            }
+        } catch (error) {
+            window.location.href = "/login";
+        }
+    }
+    useEffect(() => {
+        getCurrentUser();
+    });
 
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', backgroundColor: '#f0f2f5' }}>

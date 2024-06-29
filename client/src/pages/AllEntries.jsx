@@ -20,7 +20,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import { getUserDetails } from '../utils/Session';
 import DownloadIcon from '@mui/icons-material/Download';
-import ExportToExcelButton from './Admin/ExportExcel';
+import DownloadExcelButton from '../components/DownloadExcel';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -157,11 +157,11 @@ export default function AllEntries() {
             setUser(curuser.user);
             var res = {data: []}
             if (curuser.user.isAdmin){
-                res = await axios.get(uri + "/entries/all");
+                res = await axios.get(uri + "/entries/all?select=demandID,GSTIN,tradeNameOfTaxpayer,legalNameOfTaxpayer,FYOfTaxPeriod,GSTDesk");
             }
             else{
                 // console.log(uri + `/entries/all?GSTDesk=${curuser.user.username}`);
-                res = await axios.get(uri + `/entries/all?GSTDesk=${curuser.user.username}`);
+                res = await axios.get(uri + `/entries/all?GSTDesk=${curuser.user.username}&select=demandID,GSTIN,tradeNameOfTaxpayer,legalNameOfTaxpayer,FYOfTaxPeriod,GSTDesk`);
             }
             
             console.log(res.data);
@@ -249,7 +249,8 @@ export default function AllEntries() {
                         <MenuItem value={'FYOfTaxPeriod'}>Year</MenuItem>
                     </Select>
                 </FormControl>
-                <ExportToExcelButton excelData={demandData.data} desk={user.username} isAdmin={user.isAdmin}/>
+                {/* <ExportToExcelButton excelData={demandData.data} desk={user.username} isAdmin={user.isAdmin}/> */}
+                <DownloadExcelButton/>
                 <Search>
                     <SearchIconWrapper>
                         <SearchIcon />

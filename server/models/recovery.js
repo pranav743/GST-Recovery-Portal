@@ -65,6 +65,8 @@ const demandSchema = new mongoose.Schema({
         maxlength: [15, "Correct Recovery ID must be exactly 15 characters long"],
         // minlength: [15, "Correct Recovery ID must be exactly 15 characters long"],
         default: "",
+        // required: [true, "Correct Recovery ID is required"]
+
     },
     reasonOfDemand: {
         type: String,
@@ -92,10 +94,13 @@ const demandSchema = new mongoose.Schema({
         // minlength: [15, "Details of ARN Case Number must be exactly 15 characters long"],
         default: ""
     },
-    dateOfARNNo: Date,
+    dateOfARNNo: {
+        type: String,
+        default: ""
+    },
     paidWithDRC03: {
         type: String,
-        default: false,
+        default: "0",
     },
     ARNNoOfDRC03: {
         type: String,
@@ -103,70 +108,99 @@ const demandSchema = new mongoose.Schema({
         // minlength: [15, "ARN Number DRC-03 must be exactly 15 characters long"]
         default: '',
     },
-    dateOfDRC03: Date,
-    amountPaidByRTPAgainstLiability: {
+    dateOfDRC03: {
         type: String,
         default: ""
+    },
+    amountPaidByRTPAgainstLiability: {
+        type: String,
+        default: "0"
     },
     amountRecoveredFromCreditLedger: {
         type: String,
-        default: ""
+        default: "0"
     },
     amountRecoveredFromCashLedger: {
         type: String,
-        default: ""
+        default: "0"
     },
 
     // Multiple
     RecoveryDetails: [
         {
-            DRC13BankAttachedDate: Date,
+            DRC13BankAttachedDate: {
+                type: String,
+                default: ""
+            },
             bankBalance: {
                 type: String,
                 default: ""
             },
             amountRecoveredFromBank: {
                 type: String,
+                default: "0"
+            },
+            DRC13DebtorAttachedDate: {
+                type: String,
                 default: ""
             },
-            DRC13DebtorAttachedDate: Date,
         }
 
     ],
-    DRC13BankAttachedDate: Date,
-    bankBalance: {
+    DRC13BankAttachedDate: {
         type: String,
         default: ""
     },
-    amountRecoveredFromBankTotal: {
-        type: String,
-        default: ""
-    },
-    DRC13DebtorAttachedDate: Date,
+    // bankBalance: {
+    //     type: String,
+    //     default: ""
+    // },
+    // amountRecoveredFromBankTotal: {
+    //     type: String,
+    //     default: ""
+    // },
+    // DRC13DebtorAttachedDate: {
+    //     type: String,
+    //     required: true
+    // },
 
     // Multiple End
-
     amountRecoveredFromDebtors: {
+        type: String,
+        default: "0"
+    },
+    attachmentOfMovablePropertyDRC16Date: {
         type: String,
         default: ""
     },
-    attachmentOfMovablePropertyDRC16Date: Date,
-    attachmentOfImmovablePropertyDRC16Date: Date,
-    dateOfAuctionFixed: Date,
-    amountRecoveredFromAuction: {
+    attachmentOfImmovablePropertyDRC16Date: {
         type: String,
         default: ""
+    },
+    dateOfAuctionFixed: {
+        type: String,
+        default: ""
+    },
+    amountRecoveredFromAuction: {
+        type: String,
+        default: "0"
     },
     amountReducedOtherwise: {
         type: String,
+        default: "0"
+    },
+    reasonForReduction: {
+        type: String,
         default: ""
     },
-    reasonForReduction: String,
     actualBalanceDues: {
         type: String,
         default: ""
     },
-    remark: String
+    remark: {
+        type: String,
+        default: ""
+    }
 });
 
 const Demand = mongoose.model("Demand", demandSchema);

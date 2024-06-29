@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -25,6 +26,11 @@ import PeopleIcon from '@mui/icons-material/People';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MainPage from '../pages/Main';
 import { logout } from '../utils/Session';
+import uri from '../utils/URL';
+import { getUserDetails } from '../utils/Session';
+import { useLocation } from 'react-router-dom';
+
+
 
 const drawerWidth = 240;
 
@@ -77,6 +83,41 @@ export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [currentUser, setCurrentUser] = useState(false);
+
+  const [options, setOptions] = useState([
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+  ])
+  const getCurrentUser = async () => {
+    if (currentUser) {
+      return
+    }
+    try {
+      const curr_user = await getUserDetails();
+      console.log(curr_user);
+      setCurrentUser("USER: ", curr_user.user);
+      if (curr_user.user.isAdmin){
+        setOptions([
+          { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+          { text: 'Add User', icon: <PeopleIcon />, path: '/admin/add-user' },
+          { text: 'Users', icon: <AssignmentIcon />, path: '/admin/users' },
+          { text: 'Add Entry', icon: <AssignmentIcon />, path: '/admin/add-entry' },
+          { text: 'Upload Data', icon: <AssignmentIcon />, path: '/admin/upload' },
+          { text: 'Edit Drop Down', icon: <AssignmentIcon />, path: '/admin/edit-data' },
+        ])
+      }
+    } catch (error) {
+      // window.location.href = "/login";
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    if (location.pathname != "/login"){
+      getCurrentUser();
+    }
+    
+  });
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -86,23 +127,15 @@ export default function PersistentDrawerLeft() {
     setOpen(false);
   };
 
-  const options = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-    { text: 'Add User', icon: <PeopleIcon />, path: '/admin/add-user' },
-    { text: 'Users', icon: <AssignmentIcon />, path: '/admin/users' },
-    { text: 'Add Entry', icon: <AssignmentIcon />, path: '/admin/add-entry' },
-  ];
+
 
   const changePage = (url) => {
     navigate(url);
   }
-
-  return (
-    // window.location.pathname!='/' && window.location.pathname!='/login' && 
-
-    <Box sx={{ display: 'flex', boxShadow: 'none' }}>
+  if (!currentUser){
+    return (<Box sx={{ display: 'flex', boxShadow: 'none' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} sx={{boxShadow: 'none'}}>
+      <AppBar position="fixed" open={open} sx={{ boxShadow: 'none' }}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -138,18 +171,7 @@ export default function PersistentDrawerLeft() {
         </DrawerHeader>
         <Divider />
         <List>
-        {options.map((option, index) => (
-        <ListItem key={option.text} disablePadding>
-         
-          <ListItemButton onClick={()=> {changePage(option.path)}}>
-            <ListItemIcon>
-              {option.icon}
-            </ListItemIcon>
-            <ListItemText primary={option.text} />
-          </ListItemButton>
-      
-        </ListItem>
-      ))}
+          
         </List>
         <Divider />
         <List>
@@ -157,7 +179,7 @@ export default function PersistentDrawerLeft() {
             <ListItem key={text} disablePadding>
               <ListItemButton onClick={logout}>
                 <ListItemIcon>
-                  <LogoutIcon/>
+                  <LogoutIcon />
                 </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItemButton>
@@ -165,9 +187,83 @@ export default function PersistentDrawerLeft() {
           ))}
         </List>
       </Drawer>
-      <Main open={open} sx={{ backgroundColor: '#f0f2f5', padding: '5px'}}>
-        <DrawerHeader/>
-            <MainPage/>
+      <Main open={open} sx={{ backgroundColor: '#f0f2f5', padding: '5px' }}>
+        <DrawerHeader />
+        <MainPage />
+      </Main>
+    </Box>);
+  }
+  return (
+    // window.location.pathname!='/' && window.location.pathname!='/login' && 
+
+    <Box sx={{ display: 'flex', boxShadow: 'none' }}>
+      <CssBaseline />
+      <AppBar position="fixed" open={open} sx={{ boxShadow: 'none' }}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+            GST Deck
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+        variant="persistent"
+        anchor="left"
+        open={open}
+      >
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <List>
+          {options.map((option, index) => (
+            <ListItem key={option.text} disablePadding>
+
+              <ListItemButton onClick={() => { changePage(option.path) }}>
+                <ListItemIcon>
+                  {option.icon}
+                </ListItemIcon>
+                <ListItemText primary={option.text} />
+              </ListItemButton>
+
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List>
+          {['Logout'].map((text, index) => (
+            <ListItem key={text} disablePadding>
+              <ListItemButton onClick={logout}>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+      <Main open={open} sx={{ backgroundColor: '#f0f2f5', padding: '5px' }}>
+        <DrawerHeader />
+        <MainPage />
       </Main>
     </Box>
   );

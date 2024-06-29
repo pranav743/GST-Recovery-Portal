@@ -77,48 +77,70 @@ function removeDecimal(numberString) {
 }
 
 function ExportToExcelButton({ excelData, desk, isAdmin }) {
-
     const [workbook, setWorkbook] = useState(null);
     const [data, setData] = useState();
     console.log(excelData);
+  
     const handleExport = () => {
-        var temp = []
-        for (let z = 0; z < excelData.length; z++) {
-            let entry = excelData[z];
-            if (entry.GSTDesk === desk || isAdmin) {
-        
-                entry.actualBalanceDues = addCommasToNumber(entry.actualBalanceDues);
-                entry.amountRecoveredFromCashLedger = addCommasToNumber(entry.amountRecoveredFromCashLedger);
-                entry.amountRecoveredFromCreditLedger = addCommasToNumber(entry.amountRecoveredFromCreditLedger);
-                entry.amountPaidByRTPAgainstLiability = addCommasToNumber(entry.amountPaidByRTPAgainstLiability);
-                entry.amountPaidByRTPAgainstLiability = addCommasToNumber(entry.amountPaidByRTPAgainstLiability);
-                entry.paidWithDRC03 = removeDecimal(entry.paidWithDRC03);
-                entry.dateOfDemand = formatDate(entry.dateOfDemand);
-                var excel_obj = convertKeys(entry);
-                console.log(excel_obj)
-                temp.push(excel_obj);
-            
-            }
+      var temp = [];
+      for (let z = 0; z < excelData.length; z++) {
+        let entry = excelData[z];
+        if (entry.GSTDesk === desk || isAdmin) {
+          // Create a new object to avoid mutating the original entry
+          let newEntry = { ...entry };
+  
+          // Format entry fields
+          newEntry.actualBalanceDues = addCommasToNumber(newEntry.actualBalanceDues);
+          newEntry.amountRecoveredFromCashLedger = addCommasToNumber(newEntry.amountRecoveredFromCashLedger);
+          newEntry.amountRecoveredFromCreditLedger = addCommasToNumber(newEntry.amountRecoveredFromCreditLedger);
+          newEntry.amountPaidByRTPAgainstLiability = addCommasToNumber(newEntry.amountPaidByRTPAgainstLiability);
+          newEntry.paidWithDRC03 = removeDecimal(newEntry.paidWithDRC03);
+          newEntry.dateOfDemand = formatDate(newEntry.dateOfDemand);
+  
+          // Check if RecoveryDetails exists and is an array with at least one element
+          if (Array.isArray(newEntry.RecoveryDetails) && newEntry.RecoveryDetails.length > 0) {
+            newEntry.bankBalance = newEntry.RecoveryDetails[0].bankBalance;
+            newEntry.DRC13BankAttachedDate = newEntry.RecoveryDetails[0].DRC13BankAttachedDate;
+            newEntry.amountRecoveredFromBank = newEntry.RecoveryDetails[0].amountRecoveredFromBank;
+            newEntry.DRC13DebtorAttachedDate = newEntry.RecoveryDetails[0].DRC13DebtorAttachedDate;
+          } else {
+            // Handle case where RecoveryDetails is missing or empty
+            newEntry.bankBalance = null;
+            newEntry.DRC13BankAttachedDate = null;
+            newEntry.amountRecoveredFromBank = null;
+            newEntry.DRC13DebtorAttachedDate = null;
+          }
+  
+          // Remove the RecoveryDetails field
+          delete newEntry["RecoveryDetails"];
+  
+          // Convert keys and add to temp array
+          var excel_obj = convertKeys(newEntry);
+          console.log(excel_obj);
+          temp.push(excel_obj);
         }
-        // console.log(temp);
-
-        const worksheet = XLSX.utils.json_to_sheet(temp);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-        const currentDate = new Date();
-        const formattedDateTime = currentDate.toLocaleString();
-        XLSX.writeFile(workbook, `${formattedDateTime}.xlsx`);
+      }
+  
+      console.log(temp);
+  
+      // Create and download the Excel file
+      const worksheet = XLSX.utils.json_to_sheet(temp);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+      const currentDate = new Date();
+      const formattedDateTime = currentDate.toLocaleString();
+      XLSX.writeFile(workbook, `${formattedDateTime}.xlsx`);
     };
+  
     if (excelData.length >= 1) {
-        return (
-            <div style={{ width: '100%', padding: '5px 2vw', display: 'flex', justifyContent: 'flex-end' }}>
-                <DownloadIcon onClick={handleExport} />
-            </div>
-
-        );
+      return (
+        <div style={{ width: '100%', padding: '5px 2vw', display: 'flex', justifyContent: 'flex-end' }}>
+          <DownloadIcon onClick={handleExport} />
+        </div>
+      );
     } else {
-        return null;
+      return null;
     }
-}
-
-export default ExportToExcelButton;
+  }
+  
+  export default ExportToExcelButton;
