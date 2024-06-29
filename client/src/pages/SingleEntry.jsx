@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { TextField, Button, Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Grid, MenuItem, Select, FormControl } from '@mui/material';
-import axios from 'axios';
-import uri from '../utils/URL';
 import { TextField, Button, Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Grid, MenuItem, Select, FormControl } from '@mui/material';
 import axios from 'axios';
 import uri from '../utils/URL';
