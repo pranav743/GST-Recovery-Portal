@@ -1,3 +1,3 @@
-const uri = "http://localhost:5000/api";
+const uri = "https://gst-recovery-portal-el7o.vercel.app/api";
 
 export default uri;
