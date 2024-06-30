@@ -40,24 +40,28 @@ export default function Login() {
 
     const navigate = useNavigate();
     const handleSubmit = async (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        const loginDetails = {
-            username: data.get('username'),
-            password: data.get('password'),
-        }
         try {
-            const res = await axios.post(uri + "/login", loginDetails);
-            console.log(res);
-            if (res.data.success) {
-                successMessage(res.data.msg);
-                localStorage.setItem("gstportal", res.data.token)
-                navigate('/');
-            } else{
-                errorMessage(res.data.msg);
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const loginDetails = {
+                username: data.get('username'),
+                password: data.get('password'),
+            }
+            try {
+                const res = await axios.post(uri + "/login", loginDetails);
+                console.log(res);
+                if (res.data.success) {
+                    successMessage(res.data.msg);
+                    localStorage.setItem("gstportal", res.data.token)
+                    navigate('/');
+                } else {
+                    errorMessage(res.data.msg);
+                }
+            } catch (error) {
+                errorMessage(error.response.data.msg);
             }
         } catch (error) {
-            errorMessage(error.response.data.msg);
+            errorMessage("Some Error Occurred");
         }
         // console.log({
         //     username: data.get('username'),
@@ -65,17 +69,17 @@ export default function Login() {
         // });
     };
 
-    React.useEffect(()=> {
-        if (localStorage.getItem("gstportal")){
+    React.useEffect(() => {
+        if (localStorage.getItem("gstportal")) {
             navigate("/");
         }
-    },[]);
+    }, []);
 
     return (
 
         <Container component="main" maxWidth="xs">
             <CssBaseline />
-            <ToastContainer/>   
+            <ToastContainer />
             <Box
                 sx={{
                     marginTop: 8,
